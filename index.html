@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>英文單字卡</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <div class="app-shell">
+    <header class="app-header">
+      <h1>英文單字卡</h1>
+      <p>前面是英文，背面是中文。點擊卡片即可翻轉。</p>
+    </header>
+
+    <main class="card-area">
+      <div class="card" id="flashcard">
+        <div class="card-face card-front" id="cardFront">Loading...</div>
+        <div class="card-face card-back" id="cardBack">等待中...</div>
+      </div>
+
+      <div class="card-controls">
+        <button id="prevButton">上一張</button>
+        <button id="flipButton">翻轉</button>
+        <button id="nextButton">下一張</button>
+      </div>
+
+      <div class="progress-bar">
+        <span id="currentIndex">1</span> / <span id="totalCount">1</span>
+      </div>
+    </main>
+
+    <section class="note-section">
+      <h2>使用說明</h2>
+      <p>按「下一張」和「上一張」切換單字。按「翻轉」或點擊卡片查看中文翻譯。</p>
+    </section>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
