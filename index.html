@@ -3,39 +3,319 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>英文單字卡</title>
-  <link rel="stylesheet" href="styles.css">
+  <title>英文單字庫</title>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --card: #ffffff;
+      --text: #0f172a;
+      --accent: #2563eb;
+      --accent-dark: #1d4ed8;
+      --border: #cbd5e1;
+      --muted: #475569;
+      --danger: #dc2626;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: "Noto Sans TC", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: linear-gradient(180deg, #eef2ff 0%, #f8fafc 70%, #ffffff 100%);
+      color: var(--text);
+    }
+
+    .container {
+      max-width: 980px;
+      margin: 2rem auto 3rem;
+      padding: 0 1rem;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(2.5rem, 4vw, 3.5rem);
+      text-align: center;
+    }
+
+    p.subtitle {
+      margin: 0.75rem auto 2rem;
+      max-width: 720px;
+      text-align: center;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 1.5rem;
+      box-shadow: 0 24px 60px rgba(15, 23, 42, 0.08);
+      margin-bottom: 1.5rem;
+    }
+
+    .field-row {
+      display: grid;
+      gap: 1rem;
+      grid-template-columns: 1fr 1fr;
+      align-items: end;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.35rem;
+      font-weight: 700;
+      color: var(--muted);
+    }
+
+    input[type="text"] {
+      width: 100%;
+      padding: 0.9rem 1rem;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: #f8fafc;
+      font-size: 1rem;
+      color: var(--text);
+    }
+
+    .field-row .field {
+      display: grid;
+    }
+
+    .field-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: center;
+      margin-top: 0.4rem;
+    }
+
+    .field-actions button {
+      min-width: 120px;
+    }
+
+    .info-text {
+      color: var(--muted);
+      margin-top: 0.75rem;
+      font-size: 0.95rem;
+    }
+
+    .word-list {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 1.5rem;
+    }
+
+    .word-list th,
+    .word-list td {
+      border: 1px solid var(--border);
+      padding: 0.95rem 1rem;
+      text-align: left;
+    }
+
+    .word-list th {
+      background: #eff6ff;
+      color: var(--text);
+    }
+
+    .word-list tbody tr:nth-child(even) {
+      background: #f8fafc;
+    }
+
+    .word-list button {
+      background: var(--danger);
+      color: white;
+      border-radius: 999px;
+      padding: 0.55rem 0.9rem;
+      font-size: 0.95rem;
+      transition: background 0.2s ease;
+    }
+
+    .word-list button:hover {
+      background: #b91c1c;
+    }
+
+    .message {
+      margin-top: 0.75rem;
+      font-size: 0.95rem;
+      color: var(--muted);
+    }
+
+    .message.error {
+      color: var(--danger);
+    }
+
+    @media (max-width: 720px) {
+      .field-row {
+        grid-template-columns: 1fr;
+      }
+
+      .field-actions {
+        flex-direction: column;
+        align-items: stretch;
+      }
+
+      .word-list th,
+      .word-list td {
+        font-size: 0.95rem;
+      }
+    }
+  </style>
 </head>
 <body>
-  <div class="app-shell">
-    <header class="app-header">
-      <h1>英文單字卡</h1>
-      <p>前面是英文，背面是中文。點擊卡片即可翻轉。</p>
-    </header>
+  <div class="container">
+    <h1>英文單字庫</h1>
+    <p class="subtitle">在英文單字輸入框打字後，程式會自動呼叫免費翻譯 API，將中文翻譯帶入中文輸入框。按「添加」後，單字會存到下方清單中，並可刪除。</p>
 
-    <main class="card-area">
-      <div class="card" id="flashcard">
-        <div class="card-face card-front" id="cardFront">Loading...</div>
-        <div class="card-face card-back" id="cardBack">等待中...</div>
+    <section class="card">
+      <div class="field-row">
+        <div class="field">
+          <label for="englishInput">英文單字</label>
+          <input type="text" id="englishInput" placeholder="輸入英文單字，會自動查翻譯..." autocomplete="off">
+        </div>
+        <div class="field">
+          <label for="chineseInput">中文翻譯</label>
+          <input type="text" id="chineseInput" placeholder="中文翻譯會自動填入" readonly>
+        </div>
       </div>
 
-      <div class="card-controls">
-        <button id="prevButton">上一張</button>
-        <button id="flipButton">翻轉</button>
-        <button id="nextButton">下一張</button>
+      <div class="field-actions">
+        <button id="addButton">添加</button>
+        <span class="info-text">使用 MyMemory 完全免費翻譯 API（無需註冊）。</span>
       </div>
 
-      <div class="progress-bar">
-        <span id="currentIndex">1</span> / <span id="totalCount">1</span>
-      </div>
-    </main>
+      <div class="message" id="messageArea">輸入英文後會自動查詢中文。</div>
+    </section>
 
-    <section class="note-section">
-      <h2>使用說明</h2>
-      <p>按「下一張」和「上一張」切換單字。按「翻轉」或點擊卡片查看中文翻譯。</p>
+    <section class="card">
+      <h2>單字庫</h2>
+      <table class="word-list" id="wordTable">
+        <thead>
+          <tr>
+            <th>英文</th>
+            <th>中文</th>
+            <th>操作</th>
+          </tr>
+        </thead>
+        <tbody id="wordListBody">
+          <tr>
+            <td colspan="3" style="text-align:center;color:var(--muted);">目前尚未有單字。</td>
+          </tr>
+        </tbody>
+      </table>
     </section>
   </div>
 
-  <script src="script.js"></script>
+  <script>
+    const englishInput = document.getElementById('englishInput');
+    const chineseInput = document.getElementById('chineseInput');
+    const messageArea = document.getElementById('messageArea');
+    const addButton = document.getElementById('addButton');
+    const wordListBody = document.getElementById('wordListBody');
+
+    let debounceTimer = null;
+    let lastTranslation = '';
+
+    function setMessage(text, type = '') {
+      messageArea.textContent = text;
+      messageArea.className = type ? `message ${type}` : 'message';
+    }
+
+    function updateTable() {
+      const rows = wordListBody.querySelectorAll('tr.row-item');
+      if (rows.length === 0) {
+        wordListBody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:var(--muted);">目前尚未有單字。</td></tr>';
+      }
+    }
+
+    function addWordToList(english, chinese) {
+      const row = document.createElement('tr');
+      row.className = 'row-item';
+
+      row.innerHTML = `
+        <td>${english}</td>
+        <td>${chinese}</td>
+        <td><button type="button" class="delete-button">刪除</button></td>
+      `;
+
+      const deleteButton = row.querySelector('.delete-button');
+      deleteButton.addEventListener('click', () => {
+        row.remove();
+        updateTable();
+      });
+
+      if (wordListBody.querySelector('tr td[colspan]')) {
+        wordListBody.innerHTML = '';
+      }
+      wordListBody.appendChild(row);
+    }
+
+    async function fetchTranslation(word) {
+      const apiUrl = `https://api.mymemory.translated.net/get?q=${encodeURIComponent(word)}&langpair=en|zh-TW`;
+      try {
+        setMessage('正在查詢翻譯...');
+        const response = await fetch(apiUrl);
+        if (!response.ok) {
+          throw new Error('翻譯服務無法回應');
+        }
+        const data = await response.json();
+        const translated = data.responseData?.translatedText || '';
+        if (!translated) {
+          throw new Error('找不到中文翻譯');
+        }
+        lastTranslation = translated;
+        chineseInput.value = translated;
+        setMessage('已自動填入中文翻譯。');
+      } catch (error) {
+        lastTranslation = '';
+        chineseInput.value = '';
+        setMessage(`翻譯失敗：${error.message}`, 'error');
+      }
+    }
+
+    englishInput.addEventListener('input', () => {
+      const word = englishInput.value.trim();
+      chineseInput.value = '';
+      lastTranslation = '';
+      setMessage('輸入英文後會自動查詢中文。');
+
+      if (debounceTimer) {
+        clearTimeout(debounceTimer);
+      }
+
+      if (!word) {
+        return;
+      }
+
+      debounceTimer = setTimeout(() => {
+        fetchTranslation(word);
+      }, 500);
+    });
+
+    addButton.addEventListener('click', () => {
+      const english = englishInput.value.trim();
+      const chinese = chineseInput.value.trim() || lastTranslation;
+
+      if (!english) {
+        setMessage('請先輸入英文單字。', 'error');
+        return;
+      }
+      if (!chinese) {
+        setMessage('請等待翻譯完成，或手動輸入中文。', 'error');
+        return;
+      }
+
+      addWordToList(english, chinese);
+      englishInput.value = '';
+      chineseInput.value = '';
+      lastTranslation = '';
+      setMessage('已新增單字到單字庫。');
+    });
+
+    updateTable();
+  </script>
 </body>
 </html>
